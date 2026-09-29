@@ -56,7 +56,22 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const closeKnowMore = () => setIsKnowMoreVisible(false);
 
   const openAdmin = () => setIsAdminVisible(true);
-  const closeAdmin = () => setIsAdminVisible(false);
+  const closeAdmin = () => {
+    setIsAdminVisible(false);
+    try {
+      const pathname = window.location.pathname.toLowerCase().replace(/\/+$/, '');
+      if (
+        pathname.endsWith('/admin') ||
+        window.location.hash.toLowerCase() === '#admin' ||
+        window.location.search.toLowerCase().includes('admin')
+      ) {
+        const cleanPath = window.location.pathname.replace(/\/admin\/?$/i, '') || '/';
+        window.history.replaceState(null, '', cleanPath);
+      }
+    } catch {
+      // ignore
+    }
+  };
 
   // Automatic Timers on Page Load
   useEffect(() => {
@@ -81,20 +96,30 @@ export const ConfigProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     };
   }, [settings.isNotificationEnabled, settings.notificationDelaySeconds, settings.isPopupEnabled, settings.popupDelaySeconds]);
 
-  // URL Hash & Query Detection for /admin
+  // URL Hash, Query, and Path Detection for /admin (e.g. /admin, /admin/, #admin, ?admin=true)
   useEffect(() => {
     const checkAdminTrigger = () => {
+      const pathname = window.location.pathname.toLowerCase().replace(/\/+$/, '');
+      const hash = window.location.hash.toLowerCase();
+      const search = window.location.search.toLowerCase();
+
       if (
-        window.location.hash === '#admin' ||
-        window.location.search.includes('admin=true') ||
-        window.location.pathname.endsWith('/admin')
+        hash === '#admin' ||
+        search.includes('admin=true') ||
+        search.includes('admin') ||
+        pathname === '/admin' ||
+        pathname.endsWith('/admin')
       ) {
         setIsAdminVisible(true);
       }
     };
     checkAdminTrigger();
     window.addEventListener('hashchange', checkAdminTrigger);
-    return () => window.removeEventListener('hashchange', checkAdminTrigger);
+    window.addEventListener('popstate', checkAdminTrigger);
+    return () => {
+      window.removeEventListener('hashchange', checkAdminTrigger);
+      window.removeEventListener('popstate', checkAdminTrigger);
+    };
   }, []);
 
   // Keyboard shortcut: Escape to close modals, Alt+A or Ctrl+Shift+A to toggle admin
