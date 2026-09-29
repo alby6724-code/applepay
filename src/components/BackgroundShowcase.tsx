@@ -1,0 +1,124 @@
+import React from 'react';
+import { ProductArtwork } from './ProductArtwork';
+import { useConfig } from '../context/useConfig';
+
+export const BackgroundShowcase: React.FC = () => {
+  const { settings } = useConfig();
+  const {
+    backgroundType = 'grid',
+    backgroundTheme = 'light',
+    backgroundOpacity = 1.0,
+    backgroundBlur = 0,
+    backgroundCustomImageUrl = '',
+  } = settings;
+
+  const containerStyle: React.CSSProperties = {
+    opacity: backgroundOpacity,
+    filter: backgroundBlur > 0 ? `blur(${backgroundBlur}px)` : undefined,
+  };
+
+  const renderContent = () => {
+    switch (backgroundType) {
+      case 'hero':
+        return (
+          <div className="showcase-hero-canvas">
+            <div className="showcase-hero-tile">
+              <div className="hero-art-box">
+                <ProductArtwork type="iphone" />
+              </div>
+              <div className="hero-text-group">
+                <span className="hero-eyebrow">Apple Showcase</span>
+                <h2 className="hero-title">iPhone 16 Pro</h2>
+                <p className="hero-sub">Desert Titanium • Super Retina XDR</p>
+              </div>
+            </div>
+          </div>
+        );
+
+      case 'minimal':
+        return (
+          <div className="showcase-minimal-canvas">
+            <div className="minimal-ambient-glow" />
+            <div className="minimal-watermark-wrap">
+              <svg
+                viewBox="0 0 170 170"
+                width="140"
+                height="140"
+                fill="currentColor"
+                className="minimal-apple-svg"
+                aria-hidden="true"
+              >
+                <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.69-3.08-7.77-7.97-12.24-14.67-6.05-9.11-10.82-19.74-14.32-31.9-3.5-12.16-5.25-23.77-5.25-34.84 0-14.15 3.75-26.06 11.26-35.73 7.51-9.67 16.92-14.62 28.23-14.86 4.8 0 10.05 1.25 15.75 3.76 5.7 2.5 9.77 3.82 12.2 3.94 2.04 0 6.2-1.32 12.49-3.94 6.29-2.63 11.51-3.82 15.67-3.59 12.37.74 22.39 5.37 30.06 13.9-10.99 6.64-16.37 15.76-16.14 27.34.23 9.4 3.79 17.27 10.68 23.6 6.89 6.33 15.22 10.07 25 11.22-2.18 6.53-4.8 12.87-7.86 19.03zM119.22 33.64c0-7.38 2.66-14.17 7.98-20.37 5.32-6.2 11.83-10.28 19.53-12.27.32 1.3.48 2.66.48 4.08 0 7.37-2.73 14.31-8.19 20.82-5.46 6.51-12.06 10.36-19.8 11.55l0-3.81z" />
+              </svg>
+            </div>
+            <p className="minimal-caption">Apple Official Customer Services</p>
+          </div>
+        );
+
+      case 'custom-image':
+        if (backgroundCustomImageUrl) {
+          return (
+            <div
+              className="showcase-custom-image-canvas"
+              style={{ backgroundImage: `url(${backgroundCustomImageUrl})` }}
+            />
+          );
+        }
+        // Fallback to minimal if no URL provided
+        return (
+          <div className="showcase-minimal-canvas">
+            <div className="minimal-ambient-glow" />
+            <p className="minimal-caption">Configure custom image URL in Admin Panel</p>
+          </div>
+        );
+
+      case 'grid':
+      default:
+        return (
+          <div className="showcase-grid-canvas">
+            {/* Top Left: iPhone */}
+            <div className="showcase-tile iphone-tile">
+              <div className="tile-art-wrap">
+                <ProductArtwork type="iphone" />
+              </div>
+              <h2 className="tile-title">iPhone</h2>
+            </div>
+
+            {/* Top Right: Mac */}
+            <div className="showcase-tile mac-tile">
+              <div className="tile-art-wrap">
+                <ProductArtwork type="mac" />
+              </div>
+              <h2 className="tile-title">Mac</h2>
+            </div>
+
+            {/* Bottom Left: iPad */}
+            <div className="showcase-tile ipad-tile">
+              <div className="tile-art-wrap">
+                <ProductArtwork type="ipad" />
+              </div>
+              <h2 className="tile-title">iPad</h2>
+            </div>
+
+            {/* Bottom Right: Watch */}
+            <div className="showcase-tile watch-tile">
+              <div className="tile-art-wrap">
+                <ProductArtwork type="watch" />
+              </div>
+              <h2 className="tile-title">Watch</h2>
+            </div>
+          </div>
+        );
+    }
+  };
+
+  return (
+    <div
+      className={`fullscreen-showcase-bg theme-${backgroundTheme}`}
+      aria-hidden="true"
+      style={containerStyle}
+    >
+      {renderContent()}
+    </div>
+  );
+};
